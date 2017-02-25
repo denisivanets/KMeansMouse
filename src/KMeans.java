@@ -1,13 +1,16 @@
 import java.util.*;
-
+// Непосредственно сам алгоритм K-Means
 public class KMeans {
 
     private int K = 1;
+    //По алгоритму нужно два состояния кластеров
+    //Этот список - текущее состояние кластеров
     private List<Cluster> currentClusterState = new ArrayList<>();
+    //Этот - прошлое состояние
     private List<Cluster> previousClusterState = new ArrayList<>();
     private boolean isClustersCreated = false;
 
-
+    //Просто запускает сам алгоритм кластеризации
     public void runAlgorithm() {
         if (isClustersCreated == true) return;
         PointStorage.getInstance().dropFlags();
@@ -28,7 +31,8 @@ public class KMeans {
         changeCenters();
         makeIters();
     }
-
+    //Метод, в котором происходят итерации алгоритма, так как по самому алгоритму нужно выполнять его несколько раз
+    //Тут и проверяется условие, изменились ли кластеры или нет
     private void makeIters() {
         while (isStateChanged() == true) {
             copyLists();
@@ -38,11 +42,11 @@ public class KMeans {
         }
         isClustersCreated = true;
     }
-
+    //Метод - считает евклидово расстояние между двумя точками
     private double countDistance(double x1, double y1, double x2, double y2) {
         return Math.sqrt(Math.pow((x2 - x1), 2) + Math.pow((y2 - y1), 2));
     }
-
+    //Метод - проверяет, изменилось ли состояние кластеров или то же, что и на прошлой итерации
     private boolean isStateChanged() {
         if(currentClusterState.size() != previousClusterState.size()) return true;
         for (int i = 0; i < currentClusterState.size(); i++) {
@@ -50,7 +54,7 @@ public class KMeans {
         }
         return false;
     }
-
+    //Геттеры и сеттеры для полей
     public int getK() {
         return K;
     }
@@ -66,13 +70,13 @@ public class KMeans {
     public List<Cluster> getPreviousClusterState() {
         return previousClusterState;
     }
-
+    //Меняет центры кластеров,как того требует алгоритм
     public void changeCenters() {
         currentClusterState.forEach(
                 (cluster) -> cluster.recalcCenter()
         );
     }
-
+    //Прооставляет зависмости - какая точка к какому кластеру принадлежит
     public void makeDependecies() {
         PointStorage.getInstance().dropFlags();
         for (Point point : PointStorage.getInstance().getPointList()) {
@@ -92,13 +96,13 @@ public class KMeans {
             }
         }
     }
-
+    //Просто копирует одии список в другой
     private void copyLists() {
         for(Cluster cluster : currentClusterState){
             previousClusterState.add(cluster);
         }
     }
-
+    //Делает кластеры, исходя из самого алгоритма K-Means
     private void makeClusters() {
         for (int i = 1; i < K; i++) {
             double sunSqrDists = 0;
@@ -113,7 +117,7 @@ public class KMeans {
             currentClusterState.add(i,cluster);
         }
     }
-
+    //Считает минимальное расстояние, чтобы определить, каакой кластер ближайщий к определенной точке. В этот кластер точка и записывается позже
     public int countMinDistance(Point point) {
         double min = countDistance(point.getX(), point.getY(), currentClusterState.get(0).getX(), currentClusterState.get(0).getY());
         for (Cluster cluster : currentClusterState) {
@@ -124,7 +128,7 @@ public class KMeans {
         }
         return (int) min;
     }
-
+    //Метод нахождения точки(часть алгоритма K-Means
     public Point findPoint(double rnd){
         Point point =  getRandomPoint();
         double sum = 0;
@@ -145,7 +149,7 @@ public class KMeans {
         }
         return false;
     }
-
+    //Просто возвращает рандомную точку из множества точек. Тоже часть самого алгоритма
     private Point getRandomPoint(){
         Point rndPoint = PointStorage.getInstance().getPointList().get((int) (Math.random() * PointStorage.getInstance().getPointList().size()));
         return rndPoint;

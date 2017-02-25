@@ -2,7 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
-
+//Класс, отвечающий за отрисовку
 public class DrawingPanel extends JPanel {
 
     private KMeans kMeans = new KMeans();
@@ -11,7 +11,7 @@ public class DrawingPanel extends JPanel {
         super();
         super.setSize(500,500);
     }
-
+    //Метод отрисовывающий кластеры и точки на панели
     @Override
     public void paint(Graphics g) {
         kMeans.getCurrentClusterState().forEach(
@@ -29,14 +29,14 @@ public class DrawingPanel extends JPanel {
         );
 
     }
-
+    //метод - удаляет определенную точку с экрана
     public void deletePoint(int x, int y){
         Point deletedPoint = findNearestPoint(x, y);
         if ( null != deletedPoint ){
             PointStorage.getInstance().getPointList().remove(deletedPoint);
         }
     }
-
+    //метод - находил ближайшую точку с тем, куда ты кликнула, чтобы для удаления надо было кликать не именно в центр точки,а хотя бы очень близко с ней
     private Point findNearestPoint(int x, int y){
         double min = this.getWidth() + this.getHeight();
         Point point = null;
